@@ -306,30 +306,23 @@ endfunction
 func! CompileRunGcc()
     exec "w"
     if &filetype == 'python'
-        silent exec "!python %"
+        AsyncRun! python %
     elseif &filetype == 'c'
         if !isdirectory('build')
-            silent execute "!mkdir build"
+            AsyncRun! mkdir build && gcc -O2 "$(VIM_FILEPATH)" -o "build/$(VIM_FILENOEXT)"
+        else
+            AsyncRun! gcc -O2 "$(VIM_FILEPATH)" -o "build/$(VIM_FILENOEXT)"
         endif
-        "if(filereadable("./build/%<"))
-        "silent exec "!rm ./build/%<"
-        "endif
-        "exec "!gcc -Wall -O2 % -o build/%<"
-        AsyncRun gcc -O2 "$(VIM_FILEPATH)" -o "build/$(VIM_FILENOEXT)"
+        AsyncRun! gcc -O2 "$(VIM_FILEPATH)" -o "build/$(VIM_FILENOEXT)"
         let g:qfix_win=bufnr("$")
 
     elseif &filetype == 'cpp'
         if !isdirectory('build')
-            execute "!mkdir build"
+            AsyncRun! mkdir build &&  g++ -O2 "$(VIM_FILEPATH)" -o "build/$(VIM_FILENOEXT)" -lpthread
+        else
+            AsyncRun! g++ -O2 "$(VIM_FILEPATH)" -o "build/$(VIM_FILENOEXT)" -lpthread
         endif
-        "exec "!g++ -Wall -O2 % -o build/%<"
-        AsyncRun g++ -O2 "$(VIM_FILEPATH)" -o "build/$(VIM_FILENOEXT)" -lpthread
         let g:qfix_win=bufnr("$")
-        ""silent exec ":q"
-        "if(filereadable("./build/%<"))
-            "exec "!./build/%<"
-            "silent exec "!rm ./build/%<"
-        "endif
-        endif
+    endif
 endfunc
 "autocmd BufNew *.cpp,*.c :call SetTitle()<CR>

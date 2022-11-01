@@ -1,4 +1,6 @@
-iabb forn for(int i = 0; i < n; i++){<ESC>}i<CR>
+iabb forj for(int i = 0; i < n; i++){}<esc>V:s/ i//g<left><left>
+iabb fork for(int i = 0; i > 0; i--){}<esc>V:s/ i//g<left><left>
+
 "iabb beg \begin{<++>}<CR>\end{<++>}<ESC>1j2hd4l
 "iabb beg \section{<++>}<CR>\end{<++>}<ESC>1j2hd4l
 "iabb newth \newtheorem{thm}{<++>}<ESC>4hd4l

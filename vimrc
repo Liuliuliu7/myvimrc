@@ -6,7 +6,7 @@ let $env_c="~/Desktop/src/c_lang_learning/"
 let $LANG='en'
 set langmenu=en
 set nocompatible
-set mouse=a
+"set mouse=a
 set autochdir
 set smartindent
 syntax on
@@ -15,7 +15,6 @@ set ruler
 set expandtab
 set tabstop=4
 set shiftwidth=4
-"set autoindent
 set wrap
 set showcmd
 set showmode
@@ -33,18 +32,8 @@ set updatetime=100
 set fileencodings=utf-8
 source $VIMRUNTIME/delmenu.vim
 source $VIMRUNTIME/menu.vim
-""set tags+=./tags,"D:/down/cpp_src/tags"
-"set background=light
-"highlight cursor guifg=white guibg=black
 set cursorline
 "set completeopt+=prview,menu
-"set novisualbell
-"set noerrorbells
-"set guicursor+=a:block-blinkon0
-"set guicursor+=a:blinkon0
-"set langmenu=zh_CN.UTF-8
-"set guifontwide=黑体:h16
-"set gfw=幼圆:h10.5
 "set list
 "set listchars=trail:◌
 set autochdir
@@ -58,13 +47,12 @@ set clipboard=unnamed
 set complete-=k complete+=k
 set guifont=Consolas:h14
 
-"autocmd GuiEnter * set t_vb=
-"
 autocmd FileType cpp,c set dictionary=~/.vim/dict/c_cpp_dict.txt
+autocmd FileType python set dictionary=~/.vim/dict/python_dict.txt
 autocmd FileType plaintex set dictionary=~/.vim/dict/tex_dict.txt
 
-autocmd FileType cpp set makeprg=g++\ %\ -o\ ./build/%<
-autocmd FileType c set makeprg=gcc\ %\ -o\ ./build/%<
+autocmd FileType cpp set makeprg=g++\ %\ -o\ ./%<
+autocmd FileType c set makeprg=gcc\ %\ -o\ ./%<
 let loaded_matchparen=1
 set completeopt=menu,menuone,noselect
 set splitright
@@ -80,19 +68,10 @@ let g:netrw_list_hide = '^\..*'
 " load the user abbr 
 source ~/.vim/abbr/abbreviation.vim
 
-"set spell
-""set statusline+=%1*\%50F\ %*   " 显示文件名和文件路径 (%<应该可以去掉)
-""set statusline+=%=%2*\%y%m%r%h%w\ %*        "显示文件类型及文件状态
-""set statusline+=%3*\[%{&ff}]\[%{&fenc}]\ %* "显示文件编码类型
-""set statusline+=%4*\ row:%l/%L,col:%c\ %*   "显示光标所在行和列
-""set statusline+=%5*\%3p%%\%*   "显示光标前文本所占总文本的比例
 "colorscheme koehler
 "colorscheme ron
-"highlight cursorline ctermbg=lightgreen
 filetype plugin indent on
 filetype on
-"autocmd FileType cpp inoremap <Tab> <C-n>
-"autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 
 " user define function
 inoremap  <tab> <c-r>=Smart_TabComplete()<CR>
@@ -105,7 +84,6 @@ nnoremap <silent> s" :call ChangeToDoubleQuote()<CR>
 nnoremap <silent> s' :call ChangeToSingleQuote()<CR>
 nnoremap <silent> s :call Delete_bracket()<CR>
 nnoremap <silent> <Leader>q :call ToggleList()<CR>
-"map <silent> # :call FileList()<CR>
 
 nnoremap <Leader>a :call SequenceNumber()<CR>
 function! SequenceNumber()
@@ -135,25 +113,23 @@ inoremap w <nop>
 inoremap q <nop>
 inoremap e <nop>
 inoremap s <nop>
-"inoremap <silent> n <C-n>
 inoremap jj <ESC>
 ""inoremap ( ()<Left>
 ""inoremap { {}<Left>
 ""inoremap [ []<Left>
 ""inoremap ' ''<Left>
-"nnoremap <Tab> i<Tab><Esc>
-"inoremap u <C-u>
 inoremap d <C-w>
-"inoremap d <C-d>
 inoremap r <C-r>
 inoremap u &
 inoremap i *
 inoremap o +
+inoremap <buffer> <silent> p ^
 inoremap ( <nop>
 inoremap 9 <nop>
-"inoremap { <nop>
-"inoremap 	 <nop>
-"autocmd FileType c  :abbreviate \\ \n<CR>
+inoremap 1 5
+inoremap 2 6
+inoremap 3 7
+inoremap 4 8
 autocmd FileType c,cpp inoremap \\ \n
 autocmd FileType c,cpp inoremap kk ->
 autocmd FileType c,cpp inoremap jk ()<left>
@@ -166,10 +142,8 @@ autocmd FileType plaintex inoremap $ $$<left>
 autocmd Filetype plaintex inoremap <buffer> <silent> ff <Esc>/<++><CR>:nohlsearch<CR>c4l
 autocmd Filetype plaintex nnoremap <buffer> <silent> ff <Esc>/<++><CR>:nohlsearch<CR>c4l
 autocmd Filetype plaintex inoremap <buffer> <silent> 1 \
-autocmd Filetype plaintex inoremap <buffer> <silent> p ^
 autocmd Filetype plaintex inoremap <buffer> <silent> jk {}<left>
 autocmd Filetype plaintex inoremap <buffer> <silent> kk ()<left>
-
 
 
 nnoremap s <nop>
@@ -183,37 +157,33 @@ nnoremap L $
 nnoremap w <C-w>w
 nnoremap l :bn<CR>
 nnoremap h :bp<CR>
-nnoremap P "0p
+nnoremap P o<Esc>p
 "nnoremap [p "+p
 "nnoremap Y "+y
 "nnoremap ++ :%y"+<CR>
 nnoremap -= :w \| source ~/.vim/vimrc<CR>
 nnoremap sv <C-w>H
 nnoremap sh <C-w>K
-"nnoremap <CR> o<Esc>
 nnoremap , o<Esc>k
 nnoremap ; :
 nnoremap e %
-nnoremap gi :terminal D:/Git/bin/bash.exe<CR>
-nnoremap tt :tabnew<CR>
+nnoremap tt :tabnew<CR>:edit 
 "nnoremap tn :tabnex<CR>
 nnoremap o <C-o>
 nnoremap i <C-i>
 nnoremap n *
 nnoremap <silent> <Tab> :tabnext<CR>
 nnoremap Q :q!<CR>
-nnoremap <Leader><Leader> :wq<CR>
+"nnoremap <Leader><Leader> :wq<CR>
 nnoremap W :w<CR>
 nnoremap E :tabnew ~/.vim/vimrc<CR>
 autocmd FileType c,cpp nnoremap R :tabnew ~/c_cpp_dict.txt<CR>
 autocmd FileType plaintex nnoremap R :tabnew ~/tex_dict.txt<CR>
-"nnoremap f :redir @""<CR>
-"nnoremap ! :redir END<CR>
 nnoremap b <C-^>
 nnoremap a A;<Esc>
 nnoremap <LEADER>r zR
 nnoremap <LEADER>m zM
-nnoremap  ! :! ./build/%<<CR>
+nnoremap  ! :AsyncRun! -mode=term -pos=floaterm ./build/%<<CR>
 nnoremap < <<
 nnoremap > >>
 nnoremap b B
@@ -230,6 +200,7 @@ nnoremap = =i{
 nnoremap f zfi{
 nnoremap <C-j> 3<C-y>
 nnoremap <C-k> 3<C-e>
+nnoremap to :tabonly<CR>
 "autocmd BufRead * normal zR
 "autocmd FileType c,cpp nnoremap <CR> zA
 autocmd FileType c,cpp nnoremap y zA
@@ -262,21 +233,14 @@ vnoremap j k
 vnoremap J 5k
 vnoremap K 5j
 
-"map S :wq<CR>
-"map Q :q<CR>
-"map s <nop>
+
 map <left> :vertical res -5<CR>
 map <right> :vertical res +5<CR>
 map <up> :res +5<CR>
 map <down> :res -5<CR>
 
 tnoremap jj <C-\><C-n>
-
-hi User1 ctermfg=green ctermbg=0
-hi User2 ctermfg=yellow ctermbg=0
-hi User3 ctermfg=gray ctermbg=0
-hi User4 ctermfg=blue ctermbg=0
-hi User5 ctermfg=green ctermbg=0
+cnoremap jj <C-e><C-u><esc>
 
 call plug#begin('$VIM/plugged')
 
@@ -304,7 +268,6 @@ let g:airline#extensions#tabline#buffers_label = '❯'
 let g:airline#extensions#tabline#exclude_preview = 0
 let g:airline#extensions#tabline#buf_label_first = 0
 let g:airline#extensions#tabline#show_tab_type = 0
-
 let g:airline#extensions#whitespace#enabled = 0
 let g:airline#extensions#whitespace#symbol = '!'
 
@@ -312,10 +275,6 @@ if !exists('g:airline_symbols')
   let g:airline_symbols = {}
 endif
 "unicode symbols
-"let g:airline_left_sep = '▶'
-"let g:airline_left_alt_sep = '❯'
-"let g:airline_right_sep = '◀'
-"let g:airline_right_alt_sep = '❮'
 let g:airline_symbols.linenr = '¶'
 let g:airline_symbols.branch = '⎇'
 
@@ -337,10 +296,11 @@ Plug 'mhinz/vim-startify'
 Plug 'yggdroot/indentLine'
 
 Plug 'preservim/nerdtree'
-map <silent> # :NERDTreeToggle<CR>
-
+map <silent> # :NERDTreeToggle \| wincmd p<CR>
+" Start NERDTree and put the cursor back in the other window.
+" autocmd VimEnter * NERDTree | wincmd p
 ""当NERDTree为剩下的唯一窗口时自动关闭
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+" autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 let NERDTreeShowLineNumbers=1
 let NERDTreeShowHidden=0
 let NERDTreeWinSize=22
@@ -352,7 +312,6 @@ let g:NERDTreeDirArrowCollapsible = '═'
 "autocmd BufWinEnter * if getcmdwintype() == '' | silent NERDTreeMirror | endif
 
 Plug 'ryanoasis/vim-devicons'
-"Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 
 Plug 'preservim/tagbar'
 let g:tagbar_width=25
@@ -387,23 +346,12 @@ au Syntax * RainbowParenthesesLoadSquare
 au Syntax * RainbowParenthesesLoadBraces
 
 
-
-Plug 'kien/ctrlp.vim'
-
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
-set wildignore+=*.swp,*.zip,*.exe,*.bak,*.log,*.vim
-
-let g:ctrlp_working_path_mode = 'c'
-let g:ctrlp_by_filename = 1
-nnoremap p :CtrlPMRUFiles<CR>
-"nnoremap ^ :CtrlPBookmarkDir<CR>
-
 Plug 'skywind3000/asyncrun.vim'
 let g:asyncrun_open=8
 nnoremap j :cnext<CR>
 nnoremap k :cprevious<CR>
 nnoremap m :make<CR>
+autocmd BufEnter * if 0 == len(filter(range(1, winnr('$')), 'empty(getbufvar(winbufnr(v:val), "&bt"))')) | qa! | endif
 
 Plug 'skywind3000/vim-auto-popmenu'
 let g:apc_enable_ft = {'*':1}
@@ -429,12 +377,64 @@ set shortmess+=c
 "nmap <Leader>s :ALEToggle<CR>
 " 查看错误或警告的详细信息
 "nmap <Leader>d :ALEDetail<CR>
-
 " Use release branch (recommend)
 "Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 "Plug 'davidhalter/jedi-vim'
+Plug 'neomake/neomake'
+Plug 'voldikss/vim-floaterm'
+nnoremap <silent> f :FloatermNew --wintype=float<CR>
+nnoremap <silent> g :FloatermToggle<CR>
+nnoremap <silent> K :FloatermKill<CR>
+tnoremap <silent> k <C-\><C-n>:FloatermKill<CR>
+let g:floaterm_width = 0.7
+let g:floaterm_height = 0.7
+
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+let $FZF_DEFAULT_OPTS = '--info=inline -e --bind ctrl-k:down,ctrl-j:up --preview "bat --style=numbers --color=always --line-range :500 {}" --layout=reverse'
+nnoremap <Leader>g :FloatermNew Fzf<CR>
+nnoremap <Leader>g :FloatermNew ag
+"let g:fzf_preview_window = ['right,50%', 'ctrl-/']
+
+Plug 'easymotion/vim-easymotion'
+nmap <Leader> <Plug>(easymotion-prefix)
+" <Leader>f{char} to move to {char}
+nmap  <Leader>f <Plug>(easymotion-bd-f)
+nmap <Leader>f <Plug>(easymotion-overwin-f)
+" s{char}{char} to move to {char}{char}
+nmap <Leader>s <Plug>(easymotion-overwin-f2)
+" Move to line
+nmap <Leader>l <Plug>(easymotion-bd-jk)
+nmap <Leader>l <Plug>(easymotion-overwin-line)
+" Move to word
+nmap  <Leader>w <Plug>(easymotion-bd-w)
+nmap <Leader>w <Plug>(easymotion-overwin-w)
+
+Plug 'haya14busa/incsearch.vim'
+Plug 'haya14busa/incsearch-fuzzy.vim'
+Plug 'haya14busa/incsearch-easymotion.vim'
+let g:incsearch#auto_nohlsearch = 1
+map n  <Plug>(incsearch-nohl-n)
+map N  <Plug>(incsearch-nohl-N)
+map *  <Plug>(incsearch-nohl-*)
+map #  <Plug>(incsearch-nohl-#)
+map / <Plug>(incsearch-fuzzy-/)
+map ? <Plug>(incsearch-fuzzy-?)
+" map g/ <Plug>(incsearch-fuzzy-stay)
+function! s:config_easyfuzzymotion(...) abort
+  return extend(copy({
+  \   'converters': [incsearch#config#fuzzy#converter()],
+  \   'modules': [incsearch#config#easymotion#module()],
+  \   'keymap': {"\<CR>": '<Over>(easymotion)'},
+  \   'is_expr': 0,
+  \   'is_stay': 1
+  \ }), get(a:, 1, {}))
+endfunction
+noremap <silent><expr> g/ incsearch#go(<SID>config_easyfuzzymotion())
 
 call plug#end()
 
+
 colorscheme onedark
+call neomake#configure#automake('w')
