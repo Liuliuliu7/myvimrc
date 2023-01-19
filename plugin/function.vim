@@ -1,21 +1,32 @@
 function! Smart_TabComplete()
-  let l:line = getline('.')                         " current line
-  let l:substr = strpart(line, -1, col('.'))      " from the start of the current
-                                                    " line to one character right
-                                                    " of the cursor
-  let l:substr = matchstr(substr, "[^ \t]*$")       " word till cursor
-  if (strlen(substr) == 0)                          " nothing to match on empty string
-    return "\<tab>"
-
-  endif
-  let l:has_period = match(substr, '\.') != -1      " position of period, if any
-  let l:has_slash = match(substr, '\/') != -1       " position of slash, if any
-  if (has_slash)
-    return "\<C-X>\<C-F>"                         " file matching
-  else
-    return "\<C-N>"                         " existing text matching
-  endif
+    let l:line = getline('.')                         " current line
+    let l:substr = strpart(line, -1, col('.'))      " from the start of the current
+    " line to one character right
+    " of the cursor
+    let l:substr = matchstr(substr, "[^ \t]*$")       " word till cursor
+    if (strlen(substr) == 0)                          " nothing to match on empty string
+        return "\<tab>"
+    endif
+    let l:has_period = match(substr, '\.') != -1      " position of period, if any
+    let l:has_slash = match(substr, '\/') != -1       " position of slash, if any
+    if (has_slash && !exists("g:files_popup"))
+        let g:files_popup = 1
+        return "\<C-x>\<C-f>"                         " file matching
+    else
+        return "\<C-N>"                         " existing text matching
+        unlet g:files_popup
+    endif
 endfunction
+
+" function! SkipPair()
+    " if getline('.')[col('.') - 1] == ')' || getline('.')[col('.') - 1] == ']' || getline('.')[col('.') - 1] == '"' || getline('.')[col('.') - 1] == "'" || getline('.')[col('.') - 1] == '}'
+        " return "\<ESC>la"
+    " else
+        " return "\t"
+    " endif
+" endfunc
+" " 将tab键绑定为跳出括号
+" inoremap <TAB> <c-r>=SkipPair()<CR>
 
 function! Add_Comment()
     let l:li = line(".")
@@ -35,150 +46,195 @@ function! Add_Comment()
         call setpos(".", position)
     endif
 endfunction
-
-function! Add_Bracket()
-    let l:pre_col = col(".")
-    let l:pre_position = [0, line("."), col(".")+1, 0]
-    normal! i(
-    normal! $
-    let l:substr = strcharpart(getline("."), pre_col, col("."))
-    let l:match_col = match(substr, "[ ;,)]")
-    let l:position = [0, line("."), match_col+pre_col+1, 0]
-    if(match_col == -1)
-        normal! a)
-    else
-        call setpos(".", position)
-        normal! i)
-    endif
-    call setpos(".", pre_position)
-endfunction
-
-function! ChangeToBracket()
+" 
+" function! Add_Bracket()
+    " let l:pre_col = col(".")
+    " let l:pre_position = [0, line("."), col(".")+1, 0]
+    " normal! i(
+    " normal! $
+    " let l:substr = strcharpart(getline("."), pre_col, col("."))
+    " let l:match_col = match(substr, "[ ;,)]")
+    " let l:position = [0, line("."), match_col+pre_col+1, 0]
+    " if(match_col == -1)
+        " normal! a)
+    " else
+        " call setpos(".", position)
+        " normal! i)
+    " endif
+    " call setpos(".", pre_position)
+" endfunction
+ 
+function! SurroundDoubleQuote()
     let l:cur_char = getline(".")[col(".")-1]
-    if (cur_char == '[' || cur_char == '<')
-        let l:line = line(".")
-        let l:co = col(".")
-        let l:position = [0, line, co, 0]
-        normal! %r)
-        call setpos(".", position)
-        normal! r(
-    else
-        call Add_Bracket()
+    if(cur_char == '(')
+        normal cs("
+    elseif(cur_char == '[')
+        normal cs["
+    elseif(cur_char == "'")
+        normal cs'"
+    else 
+        normal ysiw"
     endif
 endfunction
 
-function! ChangeToSquareBracket()
+function! SurroundSquareBracket()
     let l:cur_char = getline(".")[col(".")-1]
-    if (cur_char == '(' || cur_char == '<')
-        let l:line = line(".")
-        let l:co = col(".")
-        let l:position = [0, line, co, 0]
-        normal! %r]
-        call setpos(".", position)
-        normal! r[
-    else
-        call Add_SquareBracket()
+    if(cur_char == '(')
+        normal cs(]
+    elseif(cur_char == '"')
+        normal cs"]
+    elseif(cur_char == "'")
+        normal cs']
+    else 
+        normal ysiw]
     endif
 endfunction
 
-function! Add_SquareBracket()
-    let l:pre_col = col(".")
-    let l:pre_position = [0, line("."), col(".")+1, 0]
-    normal! i[
-    normal! $
-    let l:substr = strcharpart(getline("."), pre_col, col("."))
-    let l:match_col = match(substr, "[ ;,)]")
-    let l:position = [0, line("."), match_col+pre_col+1, 0]
-    if(match_col == -1)
-        normal! a]
-    else
-        call setpos(".", position)
-        normal! i]
-    endif
-    call setpos(".", pre_position)
-endfunction
-
-function! Add_DQuote()
-    let l:pre_col = col(".")
-    let l:pre_position = [0, line("."), col(".")+1, 0]
-    normal! i"
-    normal! $
-    let l:substr = strcharpart(getline("."), pre_col, col("."))
-    let l:match_col = match(substr, "[ ;,)]")
-    let l:position = [0, line("."), match_col+pre_col+1, 0]
-    if(match_col == -1)
-        normal! a"
-    else
-        call setpos(".", position)
-        normal! i"
-    endif
-    call setpos(".", pre_position)
-endfunction
-
-function! ChangeToDoubleQuote()
+function! SurroundQuote()
     let l:cur_char = getline(".")[col(".")-1]
-    if (cur_char == "'")
-        let l:line = line(".")
-        let l:co = col(".")
-        let l:position = [0, line, co, 0]
-        normal! $
-        if(getline(".")[col(".")-1] == "'")
-            normal! r"
-        else
-            normal! F'r"
-        endif
-        call setpos(".", position)
-        normal! r"
-    else
-        call Add_DQuote()
+    if(cur_char == '(')
+        normal cs('
+    elseif(cur_char == '"')
+        normal cs"'
+    elseif(cur_char == "[")
+        normal cs['
+    else 
+        normal ysiw'
     endif
 endfunction
 
-function! Add_SQuote()
-    let l:pre_col = col(".")
-    let l:pre_position = [0, line("."), col(".")+1, 0]
-    normal! i'
-    normal! $
-    let l:substr = strcharpart(getline("."), pre_col, col("."))
-    let l:match_col = match(substr, "[ ;,)]")
-    let l:position = [0, line("."), match_col+pre_col+1, 0]
-    if(match_col == -1)
-        normal! a'
-    else
-        call setpos(".", position)
-        normal! i'
-    endif
-    call setpos(".", pre_position)
-endfunction
-
-function! ChangeToSingleQuote()
+function! SurroundBracket()
     let l:cur_char = getline(".")[col(".")-1]
-    if (cur_char == '"')
-        let l:line = line(".")
-        let l:co = col(".")
-        let l:position = [0, line, co, 0]
-        normal! $
-        if(getline(".")[col(".")-1] == '"')
-            normal! r'
-        else
-            normal! F"r'
-        endif
-        call setpos(".", position)
-        normal! r'
-    else
-        call Add_SQuote()
+    if(cur_char == '[')
+        normal cs[)
+    elseif(cur_char == '"')
+        normal cs")
+    elseif(cur_char == "'")
+        normal cs')
+    else 
+        normal ysiw)
     endif
 endfunction
+
+" function! ChangeToBracket()
+    " let l:cur_char = getline(".")[col(".")-1]
+    " if (cur_char == '[' || cur_char == '<')
+        " let l:line = line(".")
+        " let l:co = col(".")
+        " let l:position = [0, line, co, 0]
+        " normal! %r)
+        " call setpos(".", position)
+        " normal! r(
+    " else
+        " call Add_Bracket()
+    " endif
+" endfunction
+" 
+" function! ChangeToSquareBracket()
+    " let l:cur_char = getline(".")[col(".")-1]
+    " if (cur_char == '(' || cur_char == '<')
+        " let l:line = line(".")
+        " let l:co = col(".")
+        " let l:position = [0, line, co, 0]
+        " normal! %r]
+        " call setpos(".", position)
+        " normal! r[
+    " else
+        " call Add_SquareBracket()
+    " endif
+" endfunction
+" 
+" function! Add_SquareBracket()
+    " let l:pre_col = col(".")
+    " let l:pre_position = [0, line("."), col(".")+1, 0]
+    " normal! i[
+    " normal! $
+    " let l:substr = strcharpart(getline("."), pre_col, col("."))
+    " let l:match_col = match(substr, "[ ;,)]")
+    " let l:position = [0, line("."), match_col+pre_col+1, 0]
+    " if(match_col == -1)
+        " normal! a]
+    " else
+        " call setpos(".", position)
+        " normal! i]
+    " endif
+    " call setpos(".", pre_position)
+" endfunction
+" 
+" function! Add_DQuote()
+    " let l:pre_col = col(".")
+    " let l:pre_position = [0, line("."), col(".")+1, 0]
+    " normal! i"
+    " normal! $
+    " let l:substr = strcharpart(getline("."), pre_col, col("."))
+    " let l:match_col = match(substr, "[ ;,)]")
+    " let l:position = [0, line("."), match_col+pre_col+1, 0]
+    " if(match_col == -1)
+        " normal! a"
+    " else
+        " call setpos(".", position)
+        " normal! i"
+    " endif
+    " call setpos(".", pre_position)
+" endfunction
+" 
+" function! ChangeToDoubleQuote()
+    " let l:cur_char = getline(".")[col(".")-1]
+    " if (cur_char == "'")
+        " let l:line = line(".")
+        " let l:co = col(".")
+        " let l:position = [0, line, co, 0]
+        " normal! $
+        " if(getline(".")[col(".")-1] == "'")
+            " normal! r"
+        " else
+            " normal! F'r"
+        " endif
+        " call setpos(".", position)
+        " normal! r"
+    " else
+        " call Add_DQuote()
+    " endif
+" endfunction
+" 
+" function! Add_SQuote()
+    " let l:pre_col = col(".")
+    " let l:pre_position = [0, line("."), col(".")+1, 0]
+    " normal! i'
+    " normal! $
+    " let l:substr = strcharpart(getline("."), pre_col, col("."))
+    " let l:match_col = match(substr, "[ ;,)]")
+    " let l:position = [0, line("."), match_col+pre_col+1, 0]
+    " if(match_col == -1)
+        " normal! a'
+    " else
+        " call setpos(".", position)
+        " normal! i'
+    " endif
+    " call setpos(".", pre_position)
+" endfunction
+" 
+" function! ChangeToSingleQuote()
+    " let l:cur_char = getline(".")[col(".")-1]
+    " if (cur_char == '"')
+        " let l:line = line(".")
+        " let l:co = col(".")
+        " let l:position = [0, line, co, 0]
+        " normal! $
+        " if(getline(".")[col(".")-1] == '"')
+            " normal! r'
+        " else
+            " normal! F"r'
+        " endif
+        " call setpos(".", position)
+        " normal! r'
+    " else
+        " call Add_SQuote()
+    " endif
+" endfunction
 
 
 "autocmd InsertLeave * call Auto_Format()
-function! Auto_Format()
-    let l:line = line(".")
-    let l:co = col(".")
-    let l:position = [0, line, co, 0]
-    normal! ==
-    call setpos(".", position)
-endfunction
 
 function! Delete_bracket()
     let l:cur_char = getline(".")[col(".")-1]
@@ -206,26 +262,27 @@ if &term =~ "xterm"
     "" . "\<Esc>]12;darkgray\x7"
 endif
 
-function ToggleList()
-    if exists("g:qfix_win")
-        cclose
-        unlet g:qfix_win
-    else
-        copen 8
-        let g:qfix_win=bufnr("$")
-    endif
-endfunction
+" function ToggleList()
+    " if exists("g:qfix_win")
+        " normal! <C-w>j
+        " cclose
+        " unlet g:qfix_win
+    " else
+        " copen 8
+        " let g:qfix_win=1
+    " endif
+" endfunction
 
-function! FileList()
-    if exists("g:f_list")
-        unlet g:f_list
-        normal h
-        q
-    else
-        Vexplore
-        let g:f_list=1
-    endif
-endfunction
+" function! FileList()
+    " if exists("g:f_list")
+        " unlet g:f_list
+        " normal h
+        " q
+    " else
+        " Vexplore
+        " let g:f_list=1
+    " endif
+" endfunction
 
 "新建.c,.h,.sh,.java文件，自动插入文件头
 ""定义函数SetTitle，自动插入文件头
@@ -254,7 +311,7 @@ function! SetTitle()
         call append(line(".")+1, "typedef unsigned int u16;")
         call append(line(".")+2, "typedef unsigned char u8;")
         call append(line(".")+3, "")
-        call append(line(".")+4, "int main(){")
+        call append(line(".")+4, "int main() {")
         call append(line(".")+5, "")
         call append(line(".")+6, "    return 0;")
         call append(line(".")+7, "}")
@@ -265,64 +322,55 @@ function! SetTitle()
         call append(line(".")+2, "    >>> Created Time: ".strftime("%c"))
         call append(line(".")+3, "***/")
         call append(line(".")+4, "")
-        call append(line(".")+5, "#include<iostream>")
-        call append(line(".")+6, "#include<algorithm>")
+        call append(line(".")+5, "#include <algorithm>")
+        call append(line(".")+6, "#include <iostream>")
         call append(line(".")+7, "#define Maxn 0x3f3f3f3f")
         call append(line(".")+8, "#define Minn 0xaaaaaaaa")
-        call append(line(".")+9, "#define outs(a) cout << a << \" \"")
-        call append(line(".")+10, "#define outn(a) cout << a << endl")
-        call append(line(".")+11, "#define endl \"\\n\"")
-        call append(line(".")+12, "#define dscanf(n) (scanf(\"%d\", &n))")
-
-        call append(line(".")+13, "#define finm(i,n,m) for(int i=n;i<m;i++)")
-
-        call append(line(".")+14, "using namespace std;")
-        call append(line(".")+15, "" )
-        call append(line(".")+16, "int main(){")
-        call append(line(".")+17, "    ios::sync_with_stdio(false);" )
-        call append(line(".")+18, "    cin.tie(0);" )
-        call append(line(".")+19, "" )
-        call append(line(".")+20, "    return 0;")
-        call append(line(".")+21, "}")
+        call append(line(".")+9, "using namespace std;")
+        call append(line(".")+10, "" )
+        call append(line(".")+11, "int main() {")
+        call append(line(".")+12, "    ios::sync_with_stdio(false);" )
+        call append(line(".")+13, "    cin.tie(0);" )
+        call append(line(".")+14, "" )
+        call append(line(".")+15, "    return 0;")
+        call append(line(".")+16, "}")
     endif
     norm G2j
 endfunction
 "新建文件后，自动定位到文件末尾
 
-autocmd FileType c,cpp nnoremap gc :call RunGcc()<CR>
-function! RunGcc()
-    silent exec "!clear"
-    silent exec "w"
-    if !isdirectory('build')
-        silent execute "!mkdir build"
-    endif
-    if &filetype == 'cpp'
-        exec "!g++ -Wall -O2 % -o build/%<"
-    elseif &filetype == 'c'
-        exec "!gcc -Wall -O2 % -o build/%<"
-    endif
-endfunction
+" autocmd FileType c,cpp nnoremap gc :call RunGcc()<CR>
+" function! RunGcc()
+" silent exec "!clear"
+" silent exec "w"
+" if !isdirectory('build')
+" silent execute "!mkdir build"
+" endif
+" if &filetype == 'cpp'
+" exec "!g++ -Wall -O2 % -o build/%<"
+" elseif &filetype == 'c'
+" exec "!gcc -Wall -O2 % -o build/%<"
+" endif
+" endfunction
 
 func! CompileRunGcc()
-    exec "w"
-    if &filetype == 'python'
-        AsyncRun! python %
-    elseif &filetype == 'c'
+    silent exec "w"
+    silent exec "!clear"
+    if &filetype == 'c'
         if !isdirectory('build')
-            AsyncRun! mkdir build && gcc -O2 "$(VIM_FILEPATH)" -o "build/$(VIM_FILENOEXT)"
+            exec "!mkdir build && gcc -Wall -O2 % -o build/%<"
         else
-            AsyncRun! gcc -O2 "$(VIM_FILEPATH)" -o "build/$(VIM_FILENOEXT)"
+            exec "!gcc -Wall -O2 % -o build/%<"
         endif
-        AsyncRun! gcc -O2 "$(VIM_FILEPATH)" -o "build/$(VIM_FILENOEXT)"
-        let g:qfix_win=bufnr("$")
 
     elseif &filetype == 'cpp'
         if !isdirectory('build')
-            AsyncRun! mkdir build &&  g++ -O2 "$(VIM_FILEPATH)" -o "build/$(VIM_FILENOEXT)" -lpthread
+            exec "!mkdir build && g++ -Wall -O2 % -o build/%< -lpthread"
         else
-            AsyncRun! g++ -O2 "$(VIM_FILEPATH)" -o "build/$(VIM_FILENOEXT)" -lpthread
+            exec "!g++ -Wall -O2 % -o build/%< -lpthread"
         endif
-        let g:qfix_win=bufnr("$")
     endif
 endfunc
 "autocmd BufNew *.cpp,*.c :call SetTitle()<CR>
+"
+" 定义跳出括号函数，用于跳出括号

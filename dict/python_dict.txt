@@ -1,4 +1,4 @@
-imoprt 
+import 
 print
 math
 random

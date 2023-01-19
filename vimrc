@@ -1,6 +1,7 @@
 ":help index + quickref
 " user UI define
 let mapleader=" "
+" let &shell="~/AppData/Local/Microsoft/WindowsApps/Microsoft.WindowsTerminal_8wekyb3d8bbwe/wt.exe"
 let $head_c="~/Desktop/src/Head_C.h"
 let $env_c="~/Desktop/src/c_lang_learning/"
 let $LANG='en'
@@ -8,6 +9,7 @@ set langmenu=en
 set nocompatible
 "set mouse=a
 set autochdir
+set ignorecase
 set smartindent
 syntax on
 set number
@@ -42,19 +44,28 @@ set laststatus=2
 set scrolloff=4
 "set relativenumber
 set hidden
-"set foldmethod=indent
+set foldmethod=indent
+" set foldcolumn=1
+set foldlevelstart=99
+" set nofoldenable
 set clipboard=unnamed
 set complete-=k complete+=k
-set guifont=Consolas:h14
+set guifont=FiraCode\ Nerd\ Font\ Mono:h14
+set path+=~/Desktop/src/code/c/c_lang_learning/algorithm/algs4-data
+set path+=~/.vim/
+" set pythonthreedll=/c/Program\ Files/Python39/python39.dll
+set pythonthreedll=~/AppData/Local/Programs/Python/Python39/python39.dll
+set termguicolors
 
 autocmd FileType cpp,c set dictionary=~/.vim/dict/c_cpp_dict.txt
 autocmd FileType python set dictionary=~/.vim/dict/python_dict.txt
 autocmd FileType plaintex set dictionary=~/.vim/dict/tex_dict.txt
 
-autocmd FileType cpp set makeprg=g++\ %\ -o\ ./%<
-autocmd FileType c set makeprg=gcc\ %\ -o\ ./%<
+autocmd FileType cpp set makeprg=g++\ %\ -o\ ./build/%<
+autocmd FileType c set makeprg=gcc\ %\ -o\ ./build/%<
 let loaded_matchparen=1
-set completeopt=menu,menuone,noselect
+set completeopt=menu,menuone,preview,noselect
+
 set splitright
 set splitbelow
 set mousehide
@@ -64,24 +75,23 @@ let g:netrw_altv = 1
 let g:netrw_browse_split = 3
 let g:netrw_winsize = 20
 let g:netrw_list_hide = '^\..*'
-
+" runtime macros/matchit.vim
 " load the user abbr 
-source ~/.vim/abbr/abbreviation.vim
+" source ~/.vim/abbr/abbreviation.vim
 
 "colorscheme koehler
 "colorscheme ron
 filetype plugin indent on
-filetype on
 
 " user define function
 inoremap  <tab> <c-r>=Smart_TabComplete()<CR>
 autocmd FileType c,cpp  nnoremap <silent> $ :call SetTitle()<CR>
 autocmd FileType c,cpp nnoremap <silent> /  :call Add_Comment()<CR>
 autocmd FileType c,cpp vnoremap <silent> / :call Add_Comment()<CR>
-nnoremap <silent> ss  :call ChangeToBracket()<CR>
-nnoremap <silent> s[  :call ChangeToSquareBracket()<CR>
-nnoremap <silent> s" :call ChangeToDoubleQuote()<CR>
-nnoremap <silent> s' :call ChangeToSingleQuote()<CR>
+" nnoremap <silent> ss  :call ChangeToBracket()<CR>
+" nnoremap <silent> s[  :call ChangeToSquareBracket()<CR>
+" nnoremap <silent> s" :call ChangeToDoubleQuote()<CR>
+" nnoremap <silent> s' :call ChangeToSingleQuote()<CR>
 nnoremap <silent> s :call Delete_bracket()<CR>
 nnoremap <silent> <Leader>q :call ToggleList()<CR>
 
@@ -152,8 +162,8 @@ nnoremap j gk
 nnoremap K 5j
 nnoremap J 5k
 nnoremap <LEADER><CR> :nohlsearch<CR>
-nnoremap H ^
-nnoremap L $
+nnoremap H g^
+nnoremap L g$
 nnoremap w <C-w>w
 nnoremap l :bn<CR>
 nnoremap h :bp<CR>
@@ -162,15 +172,15 @@ nnoremap P o<Esc>p
 "nnoremap Y "+y
 "nnoremap ++ :%y"+<CR>
 nnoremap -= :w \| source ~/.vim/vimrc<CR>
-nnoremap sv <C-w>H
-nnoremap sh <C-w>K
+" nnoremap sv <C-w>H
+" nnoremap sh <C-w>K
 nnoremap , o<Esc>k
 nnoremap ; :
 nnoremap e %
 nnoremap tt :tabnew<CR>:edit 
 "nnoremap tn :tabnex<CR>
-nnoremap o <C-o>
-nnoremap i <C-i>
+nnoremap k <C-i>
+nnoremap j <C-o>
 nnoremap n *
 nnoremap <silent> <Tab> :tabnext<CR>
 nnoremap Q :q!<CR>
@@ -179,11 +189,12 @@ nnoremap W :w<CR>
 nnoremap E :tabnew ~/.vim/vimrc<CR>
 autocmd FileType c,cpp nnoremap R :tabnew ~/c_cpp_dict.txt<CR>
 autocmd FileType plaintex nnoremap R :tabnew ~/tex_dict.txt<CR>
-nnoremap b <C-^>
+" nnoremap b <C-^>
 nnoremap a A;<Esc>
 nnoremap <LEADER>r zR
 nnoremap <LEADER>m zM
-nnoremap  ! :AsyncRun! -mode=term -pos=floaterm ./build/%<<CR>
+autocmd FileType c,cpp  nnoremap  !  :!./build/%<<CR>
+autocmd FileType python nnoremap  !  :!python %<CR>
 nnoremap < <<
 nnoremap > >>
 nnoremap b B
@@ -194,44 +205,61 @@ nnoremap ]] ]m
 nnoremap [[ [m
 nnoremap ` <C-^>
 nnoremap 1 :vert sbn<CR>
-nnoremap <Leader>1 :ls<CR>
+" nnoremap <Leader>1 :ls<CR>
 nnoremap q :call CompileRunGcc()<CR>
-nnoremap = =i{
-nnoremap f zfi{
+" nnoremap = =i{
+" nnoremap f zfi{
 nnoremap <C-j> 3<C-y>
 nnoremap <C-k> 3<C-e>
 nnoremap to :tabonly<CR>
-"autocmd BufRead * normal zR
-"autocmd FileType c,cpp nnoremap <CR> zA
-autocmd FileType c,cpp nnoremap y zA
-autocmd QuickFixCmdPre * normal w
-"autocmd CompleteChanged *.cpp,*.c normal <C-n>
+nnoremap <Leader>/ /\c
+nnoremap <Leader>w /\c\<\><left><left>
+nnoremap <Leader>d :g/^\s*$/d<CR>
+" nnoremap <silent> <CR> za
+nnoremap <silent> A zA
+nnoremap F ;
+nnoremap T ,
+nnoremap t :tab split<CR>
+" nnoremap <C-g> g;
+nnoremap <c-g> `.
+nnoremap x "_x
+nnoremap <Leader>s :Subvert/{}/{}/g<left><left><left><left><left><left>
+
+autocmd FileType c,cpp nnoremap <silent> <buffer> <CR> zA
+"autocmd FileType c,cpp nnoremap y zA
+" autocmd QuickFixCmdPre * normal w
 
 "autocmd FileType c,cpp inoremap ;; .
 autocmd BufWinLeave *.cpp,*.c silent mkview
 autocmd BufWinEnter *.cpp,*.c silent loadview
 
-
+nnoremap ( i(
 onoremap j i(
+onoremap ) t)
+onoremap [ i[
+onoremap ] t]
 onoremap [ i[
 onoremap k i{
+onoremap } t}
 onoremap < i<
 onoremap W iw
+onoremap w aw
 onoremap L $
 onoremap H ^
 onoremap " i"
 onoremap ' i'
 onoremap ; t;
-onoremap ) t)
-onoremap , t,
-onoremap <space> t<space>
-onoremap } t}
+onoremap , f,
+onoremap <space> f<space>
 
-
-vnoremap k j
-vnoremap j k
-vnoremap J 5k
-vnoremap K 5j
+xnoremap k j
+xnoremap j k
+xnoremap J 5k
+xnoremap K 5j
+xnoremap ss :s///g<left><left><left>
+xnoremap sw :s/\<\>//g<left><left><left><left><left>
+xnoremap <Leader>d :g/^\s*$/d<CR>
+xnoremap <Leader>; :normal 
 
 
 map <left> :vertical res -5<CR>
@@ -241,6 +269,10 @@ map <down> :res -5<CR>
 
 tnoremap jj <C-\><C-n>
 cnoremap jj <C-e><C-u><esc>
+cnoremap h <left>
+cnoremap l <right>
+cnoremap j <C-p>
+cnoremap k <C-n>
 
 call plug#begin('$VIM/plugged')
 
@@ -291,16 +323,21 @@ if (has("autocmd") && !has("gui_running"))
     autocmd ColorScheme * call onedark#set_highlight("Normal", { "fg": s:white }) " `bg` will not be styled since there is no `bg` setting
   augroup END
 endif
+let g:onedark_termcolors=256
 
 Plug 'mhinz/vim-startify'
 Plug 'yggdroot/indentLine'
+" Plug 'nathanaelkane/vim-indent-guides'
+let g:indent_guides_enable_on_vim_startup = 1
+let g:indent_guides_auto_colors = 0
+autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=red   ctermbg=241
+autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=green ctermbg=240
 
 Plug 'preservim/nerdtree'
-map <silent> # :NERDTreeToggle \| wincmd p<CR>
 " Start NERDTree and put the cursor back in the other window.
 " autocmd VimEnter * NERDTree | wincmd p
 ""当NERDTree为剩下的唯一窗口时自动关闭
-" autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 let NERDTreeShowLineNumbers=1
 let NERDTreeShowHidden=0
 let NERDTreeWinSize=22
@@ -309,15 +346,15 @@ let NERDTreeAutoCenter=1
 let g:NERDTreeDirArrowExpandable = '❯'
 let g:NERDTreeDirArrowCollapsible = '═'
 " Open the existing NERDTree on each new tab.
-"autocmd BufWinEnter * if getcmdwintype() == '' | silent NERDTreeMirror | endif
+" autocmd BufWinEnter * if getcmdwintype() == ''|silent NERDTreeMirror|endif
 
 Plug 'ryanoasis/vim-devicons'
 
-Plug 'preservim/tagbar'
-let g:tagbar_width=25
+" Plug 'preservim/tagbar'
+" let g:tagbar_width=25
 "autocmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx call tagbar#autoopen()
-nnoremap <Leader>t :TagbarToggle<CR>
-let g:tagbar_sort = 0
+" nnoremap <Leader>t :TagbarToggle<CR>
+" let g:tagbar_sort = 0
 
 Plug 'jiangmiao/auto-pairs'
 Plug 'kien/rainbow_parentheses.vim'
@@ -346,12 +383,12 @@ au Syntax * RainbowParenthesesLoadSquare
 au Syntax * RainbowParenthesesLoadBraces
 
 
-Plug 'skywind3000/asyncrun.vim'
-let g:asyncrun_open=8
-nnoremap j :cnext<CR>
-nnoremap k :cprevious<CR>
-nnoremap m :make<CR>
-autocmd BufEnter * if 0 == len(filter(range(1, winnr('$')), 'empty(getbufvar(winbufnr(v:val), "&bt"))')) | qa! | endif
+" Plug 'skywind3000/asyncrun.vim'
+" let g:asyncrun_open=8
+" nnoremap j :cnext<CR>
+" nnoremap k :cprevious<CR>
+" nnoremap m :make<CR>
+" autocmd BufEnter * if 0 == len(filter(range(1, winnr('$')), 'empty(getbufvar(winbufnr(v:val), "&bt"))')) | qa! | endif
 
 Plug 'skywind3000/vim-auto-popmenu'
 let g:apc_enable_ft = {'*':1}
@@ -381,44 +418,45 @@ set shortmess+=c
 "Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 "Plug 'davidhalter/jedi-vim'
-Plug 'neomake/neomake'
-Plug 'voldikss/vim-floaterm'
-nnoremap <silent> f :FloatermNew --wintype=float<CR>
-nnoremap <silent> g :FloatermToggle<CR>
-nnoremap <silent> K :FloatermKill<CR>
-tnoremap <silent> k <C-\><C-n>:FloatermKill<CR>
-let g:floaterm_width = 0.7
-let g:floaterm_height = 0.7
+"Plug 'neomake/neomake'
+"Plug 'voldikss/vim-floaterm'
+"nnoremap <silent> f :FloatermNew --wintype=float<CR>
+"nnoremap <silent> g :FloatermToggle<CR>
+"nnoremap <silent> K :FloatermKill<CR>
+"tnoremap <silent> k <C-\><C-n>:FloatermKill<CR>
+"let g:floaterm_width = 0.7
+"let g:floaterm_height = 0.7
 
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
-let $FZF_DEFAULT_OPTS = '--info=inline -e --bind ctrl-k:down,ctrl-j:up --preview "bat --style=numbers --color=always --line-range :500 {}" --layout=reverse'
-nnoremap <Leader>g :FloatermNew Fzf<CR>
-nnoremap <Leader>g :FloatermNew ag
-"let g:fzf_preview_window = ['right,50%', 'ctrl-/']
+" Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+" Plug 'junegunn/fzf.vim'
+let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.6, 'relative': v:true, 'yoffset': 1.0 } }
+"let $FZF_DEFAULT_OPTS = '--info=inline -e --bind ctrl-k:down,ctrl-j:up --preview "bat --style=numbers --color=always --line-range :500 {}" --layout=reverse'
+"nnoremap <Leader>g :FloatermNew Fzf<CR>
+"nnoremap <Leader>g :FloatermNew ag
+""let g:fzf_preview_window = ['right,50%', 'ctrl-/']
 
-Plug 'easymotion/vim-easymotion'
-nmap <Leader> <Plug>(easymotion-prefix)
-" <Leader>f{char} to move to {char}
-nmap  <Leader>f <Plug>(easymotion-bd-f)
-nmap <Leader>f <Plug>(easymotion-overwin-f)
-" s{char}{char} to move to {char}{char}
-nmap <Leader>s <Plug>(easymotion-overwin-f2)
-" Move to line
-nmap <Leader>l <Plug>(easymotion-bd-jk)
-nmap <Leader>l <Plug>(easymotion-overwin-line)
-" Move to word
-nmap  <Leader>w <Plug>(easymotion-bd-w)
-nmap <Leader>w <Plug>(easymotion-overwin-w)
+"Plug 'easymotion/vim-easymotion'
+"nmap <Leader> <Plug>(easymotion-prefix)
+"" <Leader>f{char} to move to {char}
+"nmap  <Leader>f <Plug>(easymotion-bd-f)
+"nmap <Leader>f <Plug>(easymotion-overwin-f)
+"" s{char}{char} to move to {char}{char}
+"nmap <Leader>s <Plug>(easymotion-overwin-f2)
+"" Move to line
+"nmap <Leader>l <Plug>(easymotion-bd-jk)
+"nmap <Leader>l <Plug>(easymotion-overwin-line)
+"" Move to word
+"nmap  <Leader>w <Plug>(easymotion-bd-w)
+"nmap <Leader>w <Plug>(easymotion-overwin-w)
 
 Plug 'haya14busa/incsearch.vim'
 Plug 'haya14busa/incsearch-fuzzy.vim'
-Plug 'haya14busa/incsearch-easymotion.vim'
+" Plug 'haya14busa/incsearch-easymotion.vim'
 let g:incsearch#auto_nohlsearch = 1
-map n  <Plug>(incsearch-nohl-n)
-map N  <Plug>(incsearch-nohl-N)
-map *  <Plug>(incsearch-nohl-*)
-map #  <Plug>(incsearch-nohl-#)
+map n  <Plug>(incsearch-nohl-n)zz
+map N  <Plug>(incsearch-nohl-N)zz
+map *  <Plug>(incsearch-nohl-*)zz
+map #  <Plug>(incsearch-nohl-#)zz
 map / <Plug>(incsearch-fuzzy-/)
 map ? <Plug>(incsearch-fuzzy-?)
 " map g/ <Plug>(incsearch-fuzzy-stay)
@@ -431,10 +469,73 @@ function! s:config_easyfuzzymotion(...) abort
   \   'is_stay': 1
   \ }), get(a:, 1, {}))
 endfunction
-noremap <silent><expr> g/ incsearch#go(<SID>config_easyfuzzymotion())
+" noremap <silent><expr> g/ incsearch#go(<SID>config_easyfuzzymotion())
+
+"autocmd! BufWrite *.cpp,*.c :call Auto_Format()
+
+Plug 'rhysd/vim-clang-format'
+let g:clang_format#auto_format = 1
+
+Plug 'MarcWeber/vim-addon-mw-utils'
+Plug 'tomtom/tlib_vim'
+Plug 'garbas/vim-snipmate'
+let g:snipMate = { 'snippet_version' : 1 }
+imap <C-k> <Plug>snipMateNextOrTrigger
+smap <C-k> <Plug>snipMateNextOrTrigger
+imap <C-j> <Plug>snipMateBack
+smap <C-j> <Plug>snipMateBack
+sunmap n
+sunmap N
+
+
+Plug 'tpope/vim-surround'
+" let g:surround_no_mappings = 1
+nmap s" :call SurroundDoubleQuote()<CR>
+nmap s[ :call SurroundSquareBracket()<CR>
+nmap s' :call SurroundQuote()<CR>
+nmap s( :call SurroundBracket()<CR>
+xmap s <Plug>VSurround
+
+Plug 'MattesGroeger/vim-bookmarks'
+
+Plug 'ctrlpvim/ctrlp.vim'
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlP'
+let g:ctrlp_working_path_mode = 'ra'
+set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
+
+let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
+let g:ctrlp_custom_ignore = {
+  \ 'dir':  '\v[\/]\.(git|hg|svn)$',
+  \ 'file': '\v\.(exe|so|dll)$',
+  \ 'link': 'some_bad_symbolic_links',
+  \ }
+" let g:ctrlp_user_command = 'find %s -type f'
+let g:ctrlp_mruf_max = 500
+let g:ctrlp_follow_symlinks = 1
+let g:ctrlp_by_filename = 1
+let g:ctrlp_line_prefix = '♪ '
+let g:ctrlp_switch_buffer = 'et'
+nnoremap <Leader>f :CtrlPMRUFiles<CR>
+" use ag instead of find
+" if executable('ag')
+  " set grepprg=ag\ --nogroup\ --nocolor
+  " let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+  " let g:ctrlp_use_caching = 0
+" endif
+
+Plug 'matze/vim-move'
+let g:move_map_keys=0
+vmap k <Plug>MoveBlockDown
+vmap j <Plug>MoveBlockUp
+vmap l <Plug>MoveBlockRight
+vmap h <Plug>MoveBlockLeft
+
+Plug 'tpope/vim-abolish'
+
+" Plug 'wuelnerdotexe/nerdterm'
 
 call plug#end()
-
-
 colorscheme onedark
-call neomake#configure#automake('w')
+" call neomake#configure#automake('w')
+map <silent> # :NERDTreeToggle \| wincmd p<CR>
