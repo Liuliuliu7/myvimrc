@@ -54,7 +54,7 @@ set guifont=FiraCode\ Nerd\ Font\ Mono:h14
 set path+=~/Desktop/src/code/c/c_lang_learning/algorithm/algs4-data
 set path+=~/.vim/
 " set pythonthreedll=/c/Program\ Files/Python39/python39.dll
-set pythonthreedll=~/AppData/Local/Programs/Python/Python39/python39.dll
+set pythonthreedll=~/AppData/Local/Programs/Python/Python311/python311.dll
 set termguicolors
 
 autocmd FileType cpp,c set dictionary=~/.vim/dict/c_cpp_dict.txt
@@ -155,7 +155,6 @@ autocmd Filetype plaintex inoremap <buffer> <silent> 1 \
 autocmd Filetype plaintex inoremap <buffer> <silent> jk {}<left>
 autocmd Filetype plaintex inoremap <buffer> <silent> kk ()<left>
 
-
 nnoremap s <nop>
 nnoremap k gj
 nnoremap j gk
@@ -222,7 +221,7 @@ nnoremap T ,
 nnoremap t :tab split<CR>
 " nnoremap <C-g> g;
 nnoremap <c-g> `.
-nnoremap x "_x
+" nnoremap x "_x
 nnoremap <Leader>s :Subvert/{}/{}/g<left><left><left><left><left><left>
 
 autocmd FileType c,cpp nnoremap <silent> <buffer> <CR> zA
@@ -243,7 +242,6 @@ onoremap k i{
 onoremap } t}
 onoremap < i<
 onoremap W iw
-onoremap w aw
 onoremap L $
 onoremap H ^
 onoremap " i"
@@ -534,6 +532,10 @@ vmap h <Plug>MoveBlockLeft
 Plug 'tpope/vim-abolish'
 
 " Plug 'wuelnerdotexe/nerdterm'
+
+Plug 'tell-k/vim-autopep8'
+let g:autopep8_disable_show_diff=1
+let g:autopep8_on_save = 1
 
 call plug#end()
 colorscheme onedark
