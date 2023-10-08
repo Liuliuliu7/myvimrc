@@ -46,15 +46,18 @@ set termguicolors
 set whichwrap+=<,>,h,l
 set timeoutlen=300
 set ttimeoutlen=0
-" set nobackup
-set autowrite
-set fileformat=dos
+set nobackup
+set nowritebackup
 set shortmess+=c
 set signcolumn=number
+set undofile
+set undodir=~/.vim/undo
+set autoread
+set autowrite
+set fileformat=dos
 autocmd FileType cpp set makeprg=g++\ %\ -o\ ./build/%<
 autocmd FileType c set makeprg=gcc\ %\ -o\ ./build/%<
 let loaded_matchparen=1
-let $TMPDIR = $HOME."/tmp"
 " set completeopt=menuone,noinsert,noselect
 
 set splitright
@@ -142,6 +145,7 @@ nnoremap , o<Esc>k
 nnoremap ; :
 nnoremap e %
 nnoremap tt :tabnew<CR>:edit
+nnoremap <Leader>t :vertical terminal ++cols=50<CR>
 nnoremap l <C-i>
 nnoremap h <C-o>
 nnoremap n *
@@ -149,12 +153,10 @@ nnoremap <silent> <Tab> :tabnext<CR>
 nnoremap Q :q!<CR>
 nnoremap W :w<CR>
 nnoremap E :tabnew ~/.vim/vimrc<CR>
-autocmd FileType c,cpp nnoremap R :tabnew ~/c_cpp_dict.txt<CR>
-autocmd FileType plaintex nnoremap R :tabnew ~/tex_dict.txt<CR>
 nnoremap a A;<Esc>
 nnoremap <LEADER>r zR
 nnoremap <LEADER>m zM
-autocmd FileType c,cpp  nnoremap  !  :terminal ./build/%<<CR>
+autocmd FileType c,cpp  nnoremap  !  :vertical terminal ++cols=45 ./build/%<<CR>
 autocmd FileType python nnoremap  !  :terminal python %<CR>
 
 nnoremap < <<
@@ -171,6 +173,7 @@ nnoremap q :call CompileRunGcc()<CR>
 nnoremap <C-j> 3<C-y>
 nnoremap <C-k> 3<C-e>
 nnoremap to :tabonly<CR>
+nnoremap <Leader>, /
 nnoremap <Leader>// /\c
 nnoremap <Leader>/w /\c\<\><left><left>
 nnoremap <Leader>d :g/^\s*$/d<CR>
@@ -321,28 +324,6 @@ au Syntax * RainbowParenthesesLoadRound
 au Syntax * RainbowParenthesesLoadSquare
 au Syntax * RainbowParenthesesLoadBraces
 
-" Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-" Plug 'junegunn/fzf.vim'
-" let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.6, 'relative': v:true, 'yoffset': 1.0 } }
-"let $FZF_DEFAULT_OPTS = '--info=inline -e --bind ctrl-k:down,ctrl-j:up --preview "bat --style=numbers --color=always --line-range :500 {}" --layout=reverse'
-"nnoremap <Leader>g :FloatermNew Fzf<CR>
-"nnoremap <Leader>g :FloatermNew ag
-""let g:fzf_preview_window = ['right,50%', 'ctrl-/']
-
-"Plug 'easymotion/vim-easymotion'
-"nmap <Leader> <Plug>(easymotion-prefix)
-"" <Leader>f{char} to move to {char}
-"nmap  <Leader>f <Plug>(easymotion-bd-f)
-"nmap <Leader>f <Plug>(easymotion-overwin-f)
-"" s{char}{char} to move to {char}{char}
-"nmap <Leader>s <Plug>(easymotion-overwin-f2)
-"" Move to line
-"nmap <Leader>l <Plug>(easymotion-bd-jk)
-"nmap <Leader>l <Plug>(easymotion-overwin-line)
-"" Move to word
-"nmap  <Leader>w <Plug>(easymotion-bd-w)
-"nmap <Leader>w <Plug>(easymotion-overwin-w)
-
 Plug 'haya14busa/incsearch.vim'
 Plug 'haya14busa/incsearch-fuzzy.vim'
 let g:incsearch#auto_nohlsearch = 1
@@ -391,7 +372,7 @@ vmap l <Plug>MoveBlockRight
 vmap h <Plug>MoveBlockLeft
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-let g:coc_global_extensions = ['coc-pyright', 'coc-json', 'coc-vimlsp']
+let g:coc_global_extensions = ['coc-pyright', 'coc-json', 'coc-vimlsp', 'coc-clangd']
 inoremap <silent><expr> k
             \ coc#pum#visible() ? coc#pum#next(1) :
             \ CheckBackspace() ? "\<Down>" :
@@ -415,10 +396,14 @@ nmap <silent> gr <Plug>(coc-references)
 autocmd CursorHold * silent call CocActionAsync('highlight')
 set pumheight=8
 
-Plug 'vim-autoformat/vim-autoformat'
-let g:autoformat_autoindent = 0
-let g:autoformat_retab = 0
-au BufWrite * :Autoformat
+autocmd! FileType c,cpp Plug 'aperezdc/vim-template'
+let g:templates_no_builtin_templates = 1
+let g:templates_directory = '~/.vim/templates'
+let g:templates_user_variables = [['FileName', 'GFileName'],]
+
+function GFileName()
+    return toupper(expand('%:t:r'))
+endfunction
 
 call plug#end()
 colorscheme onedark
